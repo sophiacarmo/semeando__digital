@@ -1,0 +1,518 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semeando Digital - Sistema de Gestão Escolar</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <style>
+        :root {
+            --primary-color: #2e7d32;
+            --primary-light: #4caf50;
+            --primary-dark: #1b5e20;
+            --background-body: #f4f6f4;
+            --surface-color: #ffffff;
+            --text-main: #263238;
+            --text-muted: #78909c;
+            --border-color: #cfd8dc;
+            --danger-color: #c62828;
+            --radius-main: 10px;
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(46, 125, 50, 0.1) 0%, rgba(129, 199, 132, 0.2) 100%);
+        }
+
+        .login-card {
+            background: var(--surface-color);
+            padding: 40px;
+            border-radius: var(--radius-main);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .brand-logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .brand-subtext {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: var(--primary-dark);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            transition: var(--transition-smooth);
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 12px;
+            flex-grow: 1;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 8px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: rgba(255, 255, 255, 0.75);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            border-radius: 6px;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu li.active a {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .main-content {
+            flex-grow: 1;
+            margin-left: 260px;
+            padding: 40px;
+            width: calc(100% - 260px);
+            transition: var(--transition-smooth);
+        }
+
+        .top-navbar {
+            display: none;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 16px 20px;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 101;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .metric-card {
+            background-color: var(--surface-color);
+            padding: 24px;
+            border-radius: var(--radius-main);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            border-left: 4px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .metric-card.alert-card {
+            border-left-color: var(--danger-color);
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .metric-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .metric-icon {
+            font-size: 28px;
+            color: #cfd8dc;
+        }
+
+        .content-panel {
+            background-color: var(--surface-color);
+            border-radius: var(--radius-main);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            padding: 30px;
+            margin-bottom: 24px;
+        }
+
+        .panel-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .form-section-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--primary-color);
+            margin: 24px 0 16px 0;
+            font-weight: 700;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 6px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 16px;
+        }
+
+        .col-12 {
+            grid-column: span 12;
+        }
+
+        .col-6 {
+            grid-column: span 6;
+        }
+
+        .col-4 {
+            grid-column: span 4;
+        }
+
+        .col-3 {
+            grid-column: span 3;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--text-main);
+            background-color: var(--surface-color);
+        }
+
+        .compliance-box {
+            background-color: #efebe9;
+            border: 1px solid #d7ccc8;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+
+        .compliance-box p {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #4e342e;
+            margin-bottom: 12px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .checkbox-container input {
+            width: auto;
+            margin-top: 3px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            background-color: var(--primary-color);
+            color: white;
+            transition: var(--transition-smooth);
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .data-table th {
+            background-color: var(--background-body);
+            padding: 14px 16px;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge-danger {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+
+        .badge-warning {
+            background-color: #fff8e1;
+            color: #f57f17;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 100px 20px 40px 20px;
+            }
+
+            .top-navbar {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 768px) {
+
+            .col-6,
+            .col-4,
+            .col-3 {
+                grid-column: span 12;
+            }
+
+            .login-card {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <section id="view-login" class="login-screen">
+        <div class="login-card">
+            <div class="brand-logo"><i class="fa-solid fa-leaf"></i> Semeando Digital</div>
+            <p class="brand-subtext">Sistema de Gestão e Centralização de Dados</p>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">Usuário Institucional</label>
+                    <input type="text" id="username" placeholder="ex: secretaria@semeando" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha de Acesso</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn">Autenticar no Sistema</button>
+            </form>
+        </div>
+    </section>
+
+    <div id="app-interface" class="hidden">
+        <header class="top-navbar">
+            <div style="font-weight: 700; font-size: 18px;"><i class="fa-solid fa-leaf"></i> Semeando</div>
+            <button onclick="toggleMobileSidebar()"
+                style="background:none; border:none; color:white; font-size:20px; cursor:pointer;"><i
+                    class="fa-solid fa-bars"></i></button>
+        </header>
+
+        <aside id="sidebar-menu" class="sidebar">
+            <div class="sidebar-header"><i class="fa-solid fa-leaf"></i> Semeando Digital</div>
+            <ul class="sidebar-menu">
+                <li id="nav-dashboard" class="active"><a onclick="loadView('dashboard')"><i
+                            class="fa-solid fa-chart-pie"></i> Painel Inicial</a></li>
+                <li id="nav-matricula"><a onclick="loadView('matricula')"><i class="fa-solid fa-user-plus"></i> Nova
+                        Matrícula</a></li>
+                <li id="nav-socio"><a onclick="loadView('socio')"><i class="fa-solid fa-handshake"></i> Ficha de
+                        Sócio</a></li>
+                <li id="nav-financeiro"><a onclick="loadView('financeiro')"><i
+                            class="fa-solid fa-file-invoice-dollar"></i> Módulo Financeiro</a></li>
+                <li style="margin-top: 40px;"><a onclick="handleLogout()" style="color: #ff8a80;"><i
+                            class="fa-solid fa-power-off"></i> Encerrar Sessão</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <p>Ambiente: Secretaria Geral</p>
+                <p>Escopo: 2026.2</p>
+            </div>
+        </aside>
+
+        <main class="main-content" id="view-target">
+                   <!-- O main fica vazio, sem nenhum texto ou função dentro dele -->
+        <main class="main-content" id="view-target"></main>
+    </div>
+
+    <!-- O JavaScript precisa ficar isolado aqui dentro para rodar -->
+    <script>
+        function handleLogin(event) {
+            event.preventDefault();
+            document.getElementById('view-login').classList.add('hidden');
+            document.getElementById('app-interface').classList.remove('hidden');
+            loadView('dashboard');
+        }
+
+        function handleLogout() {
+            document.getElementById('app-interface').classList.add('hidden');
+            document.getElementById('view-login').classList.remove('hidden');
+        }
+
+        function toggleMobileSidebar() {
+            document.getElementById('sidebar-menu').classList.toggle('mobile-open');
+        }
+
+        async function loadView(viewName) {
+            try {
+                const response = await fetch(`${viewName}.html`);
+                if (!response.ok) throw new Error('Falha ao carregar módulo.');
+                const html = await response.text();
+                
+                document.getElementById('view-target').innerHTML = html;
+                
+                const menuItems = document.querySelectorAll('.sidebar-menu li');
+                menuItems.forEach(item => item.classList.remove('active'));
+                document.getElementById(`nav-${viewName}`).classList.add('active');
+                
+                document.getElementById('sidebar-menu').classList.remove('mobile-open');
+                window.scrollTo(0, 0);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>
